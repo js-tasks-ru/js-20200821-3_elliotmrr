@@ -5,14 +5,24 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
-  compareStr = compareWithDirection(compareStr, param);
+  return [...arr].sort(compareStrWrapperDirection.bind(null, param));
 
-  return [...arr].sort(compareStr);
+  /**
+   * compareStrWrapperDirection - sorts array of string with direction
+   * @param {string} direction - the sorting type "asc" or "desc" or others
+   * @param {number} a - first char to compare
+   * @param {number} b - second char to compare
+   * @returns {number}
+   */
+  function compareStrWrapperDirection(direction, a, b) {
+    switch (direction) {
+    case "desc":
+      return compareStr(b, a);
 
-  function compareWithDirection(f, direction) {
-    return function(a, b) {
-      return direction === "asc" ? f(a, b) : f(b, a);
-    };
+    default:
+    case "asc":
+      return compareStr(a, b);
+    }
   }
 
   function compareStr(a, b) {
@@ -22,12 +32,7 @@ export function sortStrings(arr, param = 'asc') {
       "ru-RU",
       "ru-BY",
     ];
-    // Intl.Collator is almost twice as fast than a.localeCompare(b)
-    const collator = new Intl.Collator(langReg, {
-      sensitivity: "variant",
-      caseFirst: "upper",
-    });
 
-    return collator.compare(a, b);
+    return a.localeCompare(b, langReg, {caseFirst: "upper"});
   }
 }
