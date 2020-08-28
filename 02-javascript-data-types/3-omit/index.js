@@ -8,12 +8,12 @@ export const omit = (obj, ...fields) => {
   const newObj = {};
   const isPropContain = (fieldProp, objProp) => fieldProp === objProp;
 
-  for (let prop in obj) {
-    if (fields.some(isPropContain.bind(null, prop))) {
+  for (let [key, value] of Object.entries(obj)) {
+    if (fields.some(isPropContain.bind(null, key))) {
       continue;
     }
 
-    newObj[prop] = obj[prop];
+    newObj[key] = value;
   }
 
   return newObj;
