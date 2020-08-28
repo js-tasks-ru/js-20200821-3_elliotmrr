@@ -6,9 +6,8 @@
  */
 export function sortStrings(arr, param = 'asc') {
   compareStr = compareWithDirection(compareStr, param);
-  const copyArr = arr.slice();
 
-  return copyArr.sort(compareStr);
+  return [...arr].sort(compareStr);
 
   function compareWithDirection(f, direction) {
     return function(a, b) {
@@ -23,6 +22,7 @@ export function sortStrings(arr, param = 'asc') {
       "ru-RU",
       "ru-BY",
     ];
+    // Intl.Collator is almost twice as fast than a.localeCompare(b)
     const collator = new Intl.Collator(langReg, {
       sensitivity: "variant",
       caseFirst: "upper",
