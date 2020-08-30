@@ -5,34 +5,24 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
-  return [...arr].sort(compareStrWrapperDirection.bind(null, param));
+  let sortedArr;
 
-  /**
-   * compareStrWrapperDirection - sorts array of string with direction
-   * @param {string} direction - the sorting type "asc" or "desc" or others
-   * @param {number} a - first char to compare
-   * @param {number} b - second char to compare
-   * @returns {number}
-   */
-  function compareStrWrapperDirection(direction, a, b) {
-    switch (direction) {
-    case "desc":
-      return compareStr(b, a);
+  switch (param) {
+  default:
+  case "asc":
+    sortedArr = sortingArr(arr, 1);
+    break;
 
-    default:
-    case "asc":
-      return compareStr(a, b);
-    }
+  case "desc":
+    sortedArr = sortingArr(arr, -1);
+    break;
   }
 
-  function compareStr(a, b) {
-    const langReg = [
-      "en-GB",
-      "en-US",
-      "ru-RU",
-      "ru-BY",
-    ];
+  return sortedArr;
 
-    return a.localeCompare(b, langReg, {caseFirst: "upper"});
+  function sortingArr(arr, direction) {
+    return [...arr].sort((a, b) => {
+      return direction * a.localeCompare(b, "default", {caseFirst: "upper"});
+    });
   }
 }
