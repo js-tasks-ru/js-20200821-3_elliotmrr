@@ -13,32 +13,19 @@ export function trimSymbols(string, size) {
     return string;
 
   default:
-    return trimmedStr();
+    return trimStr();
   }
 
-  function trimmedStr() {
-    const currentCountChar = new Map();
-    let count;
-    const filter = char => {
-      count = currentCountChar.get(char);
+  function trimStr() {
+    const firstSlice = string.slice(0, size);
+    const restSlice = [...string.slice(size)];
 
-      switch (true) {
-      case count === undefined:
-        currentCountChar.set(char, 1);
-        return true;
-
-      case count < size:
-        currentCountChar.set(char, ++count);
-        return true;
-
-      default:
-        return false;
+    return restSlice.reduce((string, char) => {
+      if (!string.endsWith(char.repeat(size))) {
+        string += char;
       }
-    };
 
-    return string
-      .split('')
-      .filter(filter)
-      .join('');
+      return string;
+    }, firstSlice);
   }
 }
