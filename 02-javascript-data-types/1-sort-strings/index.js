@@ -6,10 +6,12 @@
  */
 export function sortStrings(arr, param = 'asc') {
   switch (param) {
+  case "asc":
+    return sortingArr(arr, 1);
+
   case "desc":
     return sortingArr(arr, -1);
 
-  case "asc":
   default:
     return sortingArr(arr, 1);
   }
