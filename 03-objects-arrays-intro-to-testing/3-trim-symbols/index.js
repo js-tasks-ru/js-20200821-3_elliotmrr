@@ -13,10 +13,10 @@ export function trimSymbols(string, size) {
     return string;
 
   default:
-    return trimStr();
+    return getTrimmedStr();
   }
 
-  function trimStr() {
+  function getTrimmedStr() {
     const firstSlice = string.slice(0, size);
     const restSlice = [...string.slice(size)];
 
