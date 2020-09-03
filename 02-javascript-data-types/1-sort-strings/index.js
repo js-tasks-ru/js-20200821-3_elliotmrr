@@ -5,20 +5,16 @@
  * @returns {string[]}
  */
 export function sortStrings(arr, param = 'asc') {
-  let sortedArr;
-
   switch (param) {
-  default:
   case "asc":
-    sortedArr = sortingArr(arr, 1);
-    break;
+    return sortingArr(arr, 1);
 
   case "desc":
-    sortedArr = sortingArr(arr, -1);
-    break;
-  }
+    return sortingArr(arr, -1);
 
-  return sortedArr;
+  default:
+    return sortingArr(arr, 1);
+  }
 
   function sortingArr(arr, direction) {
     return [...arr].sort((a, b) => {
