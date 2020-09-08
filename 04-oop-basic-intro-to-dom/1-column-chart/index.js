@@ -84,8 +84,7 @@ export default class ColumnChart {
   * */
   update(bodyData = []) {
     if (!bodyData.length) {
-      // Линк продолжает отображаться
-      this.element.classList.add("column-chart_loading");
+      this.element.classList.add("column-chart_loading"); // Линк продолжает отображаться
       this.subElements.body.innerHTML = "";
 
       return;
