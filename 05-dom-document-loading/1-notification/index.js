@@ -1,17 +1,16 @@
 export default class NotificationMessage {
   element; // HTMLElement;
+  static notification;
 
-  constructor(message, {duration = 2000, type = 'success'} = {}) {
+  constructor(message, {
+    duration = 2000,
+    type = 'success',
+  } = {}) {
     this.message = message;
     this.duration = duration;
     this.type = type === "success" ? "success" : "error";
 
     this.render();
-    this.initEventListeners();
-  }
-
-  initEventListeners() {
-    this.element.addEventListener('animationend', this.remove.bind(this));
   }
 
   get template() {
@@ -37,25 +36,22 @@ export default class NotificationMessage {
   }
 
   show(target = document.body) {
-    if (globalThis.notification) {
-      globalThis.notification.remove();
-      globalThis.notification = null;
+    if (NotificationMessage.notification) {
+      NotificationMessage.notification.remove();
+      NotificationMessage.notification = null;
     }
 
     target.append(this.element);
-    globalThis.notification = this;
+    NotificationMessage.notification = this.element;
+
+    setTimeout(this.remove, this.duration);
   }
 
-  remove() {
+  remove = () => {
     this.element.remove();
-  }
-
-  finalEventListeners() {
-    this.element.removeEventListener('animationend', this.remove.bind(this));
   }
 
   destroy() {
     this.remove();
-    this.finalEventListeners();
   }
 }
