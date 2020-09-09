@@ -9,7 +9,7 @@ export default class SortableTable {
     this.render();
   }
 
-  getColumnsHeader(data) {
+  getTableHeaderCells(data) {
     return data
       .map(item => {
         return `
@@ -28,7 +28,7 @@ export default class SortableTable {
       .join('');
   }
 
-  getCellsBody(obj) {
+  getTableBodyRowCells(obj) {
     if (!obj) {
       return;
     }
@@ -36,39 +36,39 @@ export default class SortableTable {
     const cells = [];
     const cellOpen = '<div class="sortable-table__cell">';
     const cellClose = '</div>';
-    let value;
+    let cell;
 
     for (const prop of this.header) {
       switch (prop.id) {
       case undefined:
-        value = cellOpen + cellClose;
+        cell = cellOpen + cellClose;
         break;
 
       case "images":
-        value = prop.template ? prop.template(obj[prop.id]) : "";
+        cell = prop.template ? prop.template(obj[prop.id]) : "";
         break;
 
       case "status":
-        value = cellOpen + `${obj.status ? "Enabled" : "Disabled"}` + cellClose;
+        cell = cellOpen + `${obj.status ? "Enabled" : "Disabled"}` + cellClose;
         break;
 
       default:
-        value = cellOpen + `${obj[prop.id] || ""}` + cellClose;
+        cell = cellOpen + `${obj[prop.id] || ""}` + cellClose;
         break;
       }
 
-      cells.push(value);
+      cells.push(cell);
     }
 
     return cells.join("");
   }
 
-  getColumnsBody(data) {
+  getTableBodyRows(data) {
     return data
       .map(item => {
         return `
           <a href="/products/${item.id}" class="sortable-table__row">
-            ${this.getCellsBody(item)}
+            ${this.getTableBodyRowCells(item)}
           </a>
         `;
       })
@@ -81,11 +81,11 @@ export default class SortableTable {
         <div class="sortable-table">
 
           <div data-element="header" class="sortable-table__header sortable-table__row">
-            ${this.getColumnsHeader(this.header)}
+            ${this.getTableHeaderCells(this.header)}
           </div>
 
           <div data-element="body" class="sortable-table__body">
-            ${this.getColumnsBody(this.data)}
+            ${this.getTableBodyRows(this.data)}
           </div>
 
           <div data-element="loading" class="loading-line sortable-table__loading-line"></div>
@@ -113,10 +113,28 @@ export default class SortableTable {
   }
 
   getSubElements(element) {
-    const elements = element.querySelectorAll('[data-element]');
+    const elements = element.querySelectorAll('[data-element]:not([data-element="arrow"])');
 
     return [...elements].reduce((accum, subElement) => {
-      accum[subElement.dataset.element] = subElement;
+      const datasetName = subElement.dataset.element;
+
+      if (datasetName === "header") {
+        const headerElements = subElement.querySelectorAll('[data-id]');
+
+        accum.header = {
+          header: subElement,
+          elements: [...headerElements].reduce((accum, subElement) => {
+            const datasetId = subElement.dataset.id;
+
+            accum[datasetId] = subElement;
+
+            return accum;
+          }, {}),
+        };
+
+      } else {
+        accum[datasetName] = subElement;
+      }
 
       return accum;
     }, {});
@@ -127,9 +145,6 @@ export default class SortableTable {
       return;
     }
 
-    const column = this.subElements.header.querySelector(`[data-id="${fieldName}"]`);
-    column.setAttribute("data-order", direction);
-
     const columnSort = this.header.find(item => item.id === fieldName);
     const columnSortType = columnSort.sortType;
     const columnSortColNumber = this.header.indexOf(columnSort) + 1;
@@ -137,6 +152,11 @@ export default class SortableTable {
     const sortedArr = sortDirection(this.subElements.body.children);
 
     this.subElements.body.append(...sortedArr);
+
+    [...Object.values(this.subElements.header.elements)].forEach((elem) => {
+      elem.removeAttribute("data-order");
+    });
+    this.subElements.header.elements[fieldName].setAttribute("data-order", direction);
 
     function sortDirection(arr) {
       switch (direction) {
@@ -166,7 +186,7 @@ export default class SortableTable {
 
           default:
             return direction *
-              (a.querySelector(selector).firstChild.data - b.querySelector(selector).firstChild.data);
+              (a.querySelector(selector).textContent - b.querySelector(selector).textContent);
           }
         });
       }
