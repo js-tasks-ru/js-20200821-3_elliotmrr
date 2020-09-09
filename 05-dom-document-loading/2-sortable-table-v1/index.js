@@ -178,7 +178,7 @@ export default class SortableTable {
           case "string":
             return direction *
               a.querySelector(selector).textContent.trim()
-                .localeCompare(b.querySelector(selector).textContent.trim(), "default", {caseFirst: "upper"});
+                .localeCompare(b.querySelector(selector).textContent.trim(), ["ru", "en"], {caseFirst: "upper"});
 
           case "number":
             return direction *
