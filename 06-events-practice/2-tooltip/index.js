@@ -18,8 +18,8 @@ class Tooltip {
   }
 
   initEventListeners() {
-    document.addEventListener("pointerover", this.onMouseover);
-    document.addEventListener("pointerout", this.onMouseout);
+    document.addEventListener("pointerover", this.onPointerover);
+    document.addEventListener("pointerout", this.onPoinerout);
   }
 
   render(tooltip = '') {
@@ -39,7 +39,7 @@ class Tooltip {
     document.body.append(this.element);
   }
 
-  onMouseover = (event) => {
+  onPointerover = (event) => {
     const target = event.target.closest('[data-tooltip]');
 
     if (!target) {
@@ -48,50 +48,67 @@ class Tooltip {
 
     this.target = target;
     this.render(target.dataset.tooltip);
-    this.target.addEventListener("pointermove", this.onMousemove);
+    this.target.addEventListener("pointermove", this.onPointermove);
   };
 
-  onMousemove = (event) => {
+  onPointermove = (event) => {
     this.moveTooltip(event);
   }
 
+  /* TODO: реализовать "нормальное" отображение подсказки в момент попадания курсором над подсказкой. */
   moveTooltip({
     clientX,
     clientY,
   }) {
-    const shift = 7;
+    const shiftX = 16;
+    const shiftY = 20;
 
-    let x = clientX + shift; /* - this.element.offsetWidth / 2; */
-    if (x < shift) {
-      x = shift;
+    let y = clientY + shiftY;
+    let x = clientX - this.element.offsetWidth / 2; /* + shiftX; */
+
+    // Если подсказка выходит за левый край
+    if (x < shiftX) {
+      x = shiftX;
     }
 
-    let y = clientY + shift;
-    if (y < shift) {
-      y = shift;
+    // Если подсказка выходит за правый край
+    const docScreenRight = document.documentElement.clientWidth;
+    const tooltipWidth = this.element.offsetWidth + shiftX;
+
+    if (x + tooltipWidth > docScreenRight) {
+      x = docScreenRight - tooltipWidth;
     }
 
-    this.element.style.left = x + shift + "px";
-    this.element.style.top = y + shift + "px";
+    // Подсказка не может выйти за верхний край
+    // Если подсказка выходит за нижний край
+    const docScreenBottom = document.documentElement.clientHeight;
+    const tooltipHeight = this.element.offsetHeight + shiftY;
+
+    if (y + tooltipHeight > docScreenBottom) {
+      y = docScreenBottom - tooltipHeight;
+    }
+
+    this.element.style.left = x + "px";
+    this.element.style.top = y + "px";
   }
 
-  onMouseout = (event) => {
+  onPoinerout = (event) => {
     if (!this.target) {
       return;
     }
 
-    this.target.removeEventListener("pointermove", this.onMousemove);
+    this.target.removeEventListener("pointermove", this.onPointermove);
     this.target = null;
     this.remove();
   };
 
   deinEventListeners() {
-    document.removeEventListener("pointerover", this.onMouseover);
-    document.removeEventListener("pointerout", this.onMouseout);
+    document.removeEventListener("pointerover", this.onPointerover);
+    document.removeEventListener("pointerout", this.onPoinerout);
   }
 
   deinitialize() {
-    this.onMouseout();
+    this.onPoinerout();
     this.destroy();
   }
 
