@@ -23,18 +23,21 @@ export default class SortableTable {
 
   constructor(headersConfig = [], {
     data = [],
-    sort: sortingColumn = headersConfig.find(obj => obj.sortable).id,
+    sorting = {
+      id: headersConfig.find(item => item.sortable).id,
+      order: 'asc',
+    },
   } = {}) {
     this.headersConfig = headersConfig;
     this.data = data;
-    this.sortingColumn = sortingColumn;
+    this.sorting = sorting;
 
     this.render();
     this.initEventListeners();
   }
 
   initEventListeners() {
-    this.header.addEventListener("pointerdown", this.sortOnClickHeader);
+    this.subElements.header.addEventListener("pointerdown", this.sortOnClickHeader);
   }
 
   getTableHeader() {
@@ -46,12 +49,12 @@ export default class SortableTable {
   }
 
   getTableHeaderCells({id, title, sortable}) {
-    const order = sortable ? 'data-order="asc"' : "";
+    const order = sortable ? `data-order="${this.sorting.order}"` : "";
 
     return `
       <div class="sortable-table__cell" data-id="${id}" data-sortable="${sortable}" ${order}>
         <span>${title}</span>
-        ${id === this.sortingColumn ? this.getHeaderSortingArrow() : ""}
+        ${id === this.sorting.id ? this.getHeaderSortingArrow() : ""}
       </div>
     `;
   }
@@ -106,12 +109,12 @@ export default class SortableTable {
 
   render() {
     const $wrapper = document.createElement('div');
-    $wrapper.innerHTML = this.getTable(this.sortData(this.sortingColumn));
+    $wrapper.innerHTML = this.getTable(this.sortData(this.sorting.id));
     const element = $wrapper.firstElementChild;
 
     this.element = element;
     this.subElements = this.getSubElements(element);
-    this.setCaret(this.sortingColumn);
+    this.setCaret(this.sorting.id);
   }
 
   getSubElements(element) {
@@ -125,8 +128,7 @@ export default class SortableTable {
   }
 
   setCaret(field, order = 'asc') {
-    const currentColumn = this.element
-      .querySelector(`[data-element="header"] [data-id="${field}"]`);
+    const currentColumn = this.subElements.header.querySelector(`[data-id="${field}"]`);
 
     currentColumn.dataset.order = order;
     currentColumn.append(this.arrow);
