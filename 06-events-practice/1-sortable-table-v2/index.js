@@ -37,7 +37,7 @@ export default class SortableTable {
   }
 
   initEventListeners() {
-    this.subElements.header.addEventListener("pointerdown", this.sortOnClickHeader);
+    this.header.addEventListener("pointerdown", this.sortOnClickHeader);
   }
 
   getTableHeader() {
@@ -128,7 +128,7 @@ export default class SortableTable {
   }
 
   setCaret(field, order = 'asc') {
-    const currentColumn = this.subElements.header.querySelector(`[data-id="${field}"]`);
+    const currentColumn = this.header.querySelector(`[data-id="${field}"]`);
 
     currentColumn.dataset.order = order;
     currentColumn.append(this.arrow);
@@ -161,6 +161,15 @@ export default class SortableTable {
     });
   }
 
+  remove () {
+    this.element.remove();
+  }
+
+  destroy() {
+    this.remove();
+    this.subElements = {};
+  }
+
   get arrow() {
     return this.subElements.arrow;
   }
@@ -171,14 +180,5 @@ export default class SortableTable {
 
   get body() {
     return this.subElements.body;
-  }
-
-  remove () {
-    this.element.remove();
-  }
-
-  destroy() {
-    this.remove();
-    this.subElements = {};
   }
 }
