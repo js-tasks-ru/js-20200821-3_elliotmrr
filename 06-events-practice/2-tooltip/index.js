@@ -9,10 +9,6 @@ class Tooltip {
     `;
   }
 
-  constructor() {
-
-  }
-
   initialize() {
     this.initEventListeners();
   }
